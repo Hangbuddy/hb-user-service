@@ -24,10 +24,10 @@ namespace UserService.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("get-user/{id}", Name = "GetUser")]
-        public ActionResult<UserReadDto> GetUser(string username)
+        [HttpGet("get-user", Name = "GetUser")]
+        public ActionResult<UserReadDto> GetUser(int userId)
         {
-            var userItem = _repository.GetUser(username);
+            var userItem = _repository.GetUser(userId);
             if (userItem != null)
             {
                 return Ok(_mapper.Map<UserReadDto>(userItem));
@@ -54,7 +54,7 @@ namespace UserService.Controllers
             var userModel = _mapper.Map<User>(userUpdateDto);
             _repository.UpdateUser(userModel);
             _repository.SaveChanges();
-            return CreatedAtRoute(nameof(GetUser), new { id = userUpdateDto.Username }, userUpdateDto);
+            return CreatedAtRoute(nameof(GetUser), new { id = userUpdateDto.UserId }, userUpdateDto);
         }
 
         [HttpPost("login")]

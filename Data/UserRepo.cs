@@ -20,9 +20,14 @@ namespace UserService.Data
             return (_context.SaveChanges() >= 0);
         }
 
-        public User GetUser(string username)
+        public User GetUser(int userId)
         {
-            return _context.Users.FirstOrDefault(p => p.Username == username);
+            return _context.Users.FirstOrDefault(p => p.Id == userId);
+        }
+
+        public void DeleteUser(User user)
+        {
+            _context.Users.Remove(user);
         }
 
         public void CreateUser(User user)

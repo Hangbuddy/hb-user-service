@@ -7,7 +7,7 @@ namespace UserService.Data
     {
         bool SaveChanges();
         
-        User GetUser(string username);
+        User GetUser(int userId);
 
         void CreateUser(User user);
 

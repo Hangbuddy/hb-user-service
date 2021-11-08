@@ -31,22 +31,6 @@ namespace UserService.Data
                     Console.WriteLine($"--> Could not run migrations: {ex.Message}");
                 }
             }
-
-            if (!context.Users.Any())
-            {
-                Console.WriteLine("--> Seeding Data...");
-
-                context.Users.AddRange(
-                    new User() { Username = "sahinu", Password = "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5", DisplayName = "Sahin Uz", Bio = "Backend Developer", IsActive = true, CreatedAt = new DateTime(2021, 11, 02) },
-                    new User() { Username = "guneyc", Password = "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5", DisplayName = "Guney Cobanoglu", Bio = "Frontend Developer", IsActive = true, CreatedAt = new DateTime(2021, 11, 02) }
-                );
-
-                context.SaveChanges();
-            }
-            else
-            {
-                Console.WriteLine("--> We already have data");
-            }
         }
     }
 }
