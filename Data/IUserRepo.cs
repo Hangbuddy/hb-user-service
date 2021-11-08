@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UserService.Models;
 
 namespace UserService.Data
@@ -6,7 +5,7 @@ namespace UserService.Data
     public interface IUserRepo
     {
         bool SaveChanges();
-        
+
         User GetUser(int userId);
 
         void CreateUser(User user);
