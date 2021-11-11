@@ -1,11 +1,16 @@
 using System;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using UserService.Configuration;
 using UserService.Data;
 
 namespace UserService
@@ -13,33 +18,46 @@ namespace UserService
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        private readonly IWebHostEnvironment _env;
 
-        public Startup(IConfiguration configuration, IWebHostEnvironment env)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _env = env;
         }
 
 
         public void ConfigureServices(IServiceCollection services)
         {
-            if (_env.IsProduction())
+            Console.WriteLine("--> Using SqlServer Db");
+            services.AddDbContext<AppDbContext>(opt =>
+                opt.UseSqlServer(Configuration.GetConnectionString("UsersConn")));
+
+            services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
+            services.AddAuthentication(opt =>
             {
-                Console.WriteLine("--> Using SqlServer Db");
-                services.AddDbContext<AppDbContext>(opt =>
-                    opt.UseSqlServer(Configuration.GetConnectionString("UsersConn")));
-            }
-            else
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(jwt =>
             {
-                Console.WriteLine("--> Using InMem Db");
-                services.AddDbContext<AppDbContext>(opt =>
-                    opt.UseInMemoryDatabase("InMem")
-                );
-            }
+                var key = Encoding.ASCII.GetBytes(Configuration["JwtConfig:Secret"]);
+
+                jwt.SaveToken = true;
+                jwt.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    RequireExpirationTime = false
+                    // TODO: Update these before deployment.
+                };
+            });
+            services.AddDefaultIdentity<IdentityUser>(opt => opt.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<AppDbContext>();
 
             services.AddScoped<IUserRepo, UserRepo>();
-
             services.AddControllers();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddSwaggerGen(c =>
@@ -65,7 +83,7 @@ namespace UserService
                 endpoints.MapControllers();
             });
 
-            PrepDb.PrepPopulation(app, env.IsProduction());
+            PrepDb.PrepPopulation(app);
 
         }
     }

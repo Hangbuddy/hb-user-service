@@ -15,47 +15,26 @@ namespace UserService.Data
 
         public bool SaveChanges()
         {
-            return (_context.SaveChanges() >= 0);
+            return _context.SaveChanges() >= 0;
         }
 
-        public User GetUser(int userId)
+        public ApplicationUser GetUser(string userId)
         {
-            return _context.Users.FirstOrDefault(p => p.Id == userId);
+            return _context.ApplicationUsers.FirstOrDefault(p => p.Id == userId);
         }
 
-        public void DeleteUser(User user)
-        {
-            _context.Users.Remove(user);
-        }
-
-        public void CreateUser(User user)
+        public void UpdateUser(ApplicationUser user)
         {
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            _context.Users.Add(user);
+            _context.ApplicationUsers.Update(user);
         }
 
-        public void UpdateUser(User user)
+        public void CreateUser(ApplicationUser user)
         {
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-            _context.Users.Update(user);
+            _context.ApplicationUsers.Add(user);
         }
-
-        public User Login(User user)
-        {
-            var _user = _context.Users.FirstOrDefault(p => p.Username == user.Username);
-            if (_user is null)
-                return null;
-            if (_user.Password.Equals(user.Password))
-                return _user;
-            else
-                return null;
-        }
-
     }
 }
