@@ -1,188 +1,43 @@
 {
-    "openapi": "3.0.1",
-    "info": {
-      "title": "UserService",
-      "version": "v1"
-    },
-    "paths": {
-      "/api/Users/get-user": {
-        "get": {
-          "tags": [
-            "Users"
-          ],
-          "operationId": "GetUser",
-          "parameters": [
-            {
-              "name": "userId",
-              "in": "query",
-              "schema": {
-                "type": "integer",
-                "format": "int32"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Success",
-              "content": {
-                "text/plain": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserReadDto"
-                  }
-                },
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserReadDto"
-                  }
-                },
-                "text/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserReadDto"
-                  }
-                }
-              }
+  "openapi": "3.0.1",
+  "info": {
+    "title": "UserService",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/Users/get-user": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
             }
           }
-        }
-      },
-      "/api/Users/create-user": {
-        "post": {
-          "tags": [
-            "Users"
-          ],
-          "requestBody": {
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
             "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserCreateDto"
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserCreateDto"
-                }
-              },
-              "application/*+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserCreateDto"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Success",
-              "content": {
-                "text/plain": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserReadDto"
-                  }
-                },
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserReadDto"
-                  }
-                },
-                "text/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserReadDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/api/Users/update-user": {
-        "post": {
-          "tags": [
-            "Users"
-          ],
-          "requestBody": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserUpdateDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserUpdateDto"
-                }
-              },
-              "application/*+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserUpdateDto"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Success",
-              "content": {
-                "text/plain": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserReadDto"
-                  }
-                },
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserReadDto"
-                  }
-                },
-                "text/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserReadDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/api/Users/login": {
-        "post": {
-          "tags": [
-            "Users"
-          ],
-          "requestBody": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserLoginDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserLoginDto"
-                }
-              },
-              "application/*+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserLoginDto"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Success",
-              "content": {
-                "text/plain": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserReadDto"
-                  }
-                },
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserReadDto"
-                  }
-                },
-                "text/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserReadDto"
-                  }
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
                 }
               }
             }
@@ -190,120 +45,255 @@
         }
       }
     },
-    "components": {
-      "schemas": {
-        "UserReadDto": {
-          "type": "object",
-          "properties": {
-            "userId": {
-              "type": "integer",
-              "format": "int32"
+    "/api/Users/update-user": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationUserUpdateDto"
+              }
             },
-            "username": {
-              "type": "string",
-              "nullable": true
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationUserUpdateDto"
+              }
             },
-            "displayName": {
-              "type": "string",
-              "nullable": true
-            },
-            "bio": {
-              "type": "string",
-              "nullable": true
-            },
-            "ppLink": {
-              "type": "string",
-              "nullable": true
-            },
-            "isActive": {
-              "type": "boolean"
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updatedAt": {
-              "type": "string",
-              "format": "date-time"
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationUserUpdateDto"
+              }
             }
-          },
-          "additionalProperties": false
+          }
         },
-        "UserCreateDto": {
-          "required": [
-            "password",
-            "username"
-          ],
-          "type": "object",
-          "properties": {
-            "username": {
-              "type": "string"
-            },
-            "password": {
-              "type": "string"
-            },
-            "displayName": {
-              "type": "string",
-              "nullable": true
-            },
-            "bio": {
-              "type": "string",
-              "nullable": true
-            },
-            "ppLink": {
-              "type": "string",
-              "nullable": true
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              }
             }
-          },
-          "additionalProperties": false
+          }
+        }
+      }
+    },
+    "/api/Users/create-user": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationUserCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationUserCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationUserCreateDto"
+              }
+            }
+          }
         },
-        "UserUpdateDto": {
-          "required": [
-            "userId"
-          ],
-          "type": "object",
-          "properties": {
-            "userId": {
-              "type": "string"
-            },
-            "password": {
-              "type": "string",
-              "nullable": true
-            },
-            "displayName": {
-              "type": "string",
-              "nullable": true
-            },
-            "bio": {
-              "type": "string",
-              "nullable": true
-            },
-            "ppLink": {
-              "type": "string",
-              "nullable": true
-            },
-            "isActive": {
-              "type": "boolean"
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              }
             }
-          },
-          "additionalProperties": false
+          }
+        }
+      }
+    },
+    "/api/Users/login": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationUserLoginDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationUserLoginDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationUserLoginDto"
+              }
+            }
+          }
         },
-        "UserLoginDto": {
-          "required": [
-            "password",
-            "username"
-          ],
-          "type": "object",
-          "properties": {
-            "username": {
-              "type": "string"
-            },
-            "password": {
-              "type": "string"
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              }
             }
-          },
-          "additionalProperties": false
+          }
         }
       }
     }
+  },
+  "components": {
+    "schemas": {
+      "ApplicationUserReadDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true
+          },
+          "ppLink": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ApplicationUserUpdateDto": {
+        "required": [
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true
+          },
+          "ppLink": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ApplicationUserCreateDto": {
+        "required": [
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ApplicationUserLoginDto": {
+        "required": [
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
   }
+}

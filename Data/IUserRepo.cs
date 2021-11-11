@@ -6,12 +6,10 @@ namespace UserService.Data
     {
         bool SaveChanges();
 
-        User GetUser(int userId);
+        ApplicationUser GetUser(string userId);
 
-        void CreateUser(User user);
+        void UpdateUser(ApplicationUser user);
 
-        void UpdateUser(User user);
-
-        User Login(User user);
+        void CreateUser(ApplicationUser user);
     }
 }
