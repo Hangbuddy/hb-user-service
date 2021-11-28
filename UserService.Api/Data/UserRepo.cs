@@ -25,6 +25,7 @@ namespace UserService.Data
 
             return new ApplicationUserRead()
             {
+                Id = user.Id,
                 Email = user.Email,
                 Username = user.UserName,
                 DisplayName = applicationUser.DisplayName,

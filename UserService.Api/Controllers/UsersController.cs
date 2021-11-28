@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using UserService.Configuration;
 using UserService.Data;
+using UserService.Dtos.Enums;
 using UserService.Dtos.Requests;
 using UserService.Dtos.Responses;
 using UserService.Models;
@@ -74,55 +75,45 @@ namespace UserService.Controllers
             {
                 if (await _userManager.FindByNameAsync(userCreateDto.Username) != null)
                 {
-                    return BadRequest(new RegistrationResponse()
+                    return BadRequest(new RegisterResultDto()
                     {
-                        Errors = new List<string>() {
-                                "Username already in use."
-                            },
-                        Success = false
+                        ErrorCode = ErrorCodes.UsernameAlreadyInUse
                     });
                 }
-
                 if (await _userManager.FindByEmailAsync(userCreateDto.Email) != null)
                 {
-                    return BadRequest(new RegistrationResponse()
+                    return BadRequest(new RegisterResultDto()
                     {
-                        Errors = new List<string>() {
-                                "E-mail already in use."
-                            },
-                        Success = false
+                        ErrorCode = ErrorCodes.EmailAlreadyInUse
                     });
                 }
 
                 var newUser = new IdentityUser() { Email = userCreateDto.Email, UserName = userCreateDto.Username };
-                _repository.CreateUser(_mapper.Map<ApplicationUser>(newUser));
+                var applicationUser = _mapper.Map<ApplicationUser>(newUser);
+                _repository.CreateUser(applicationUser);
                 var isCreated = await _userManager.CreateAsync(newUser, userCreateDto.Password);
                 if (isCreated.Succeeded)
                 {
-                    var jwtToken = GenerateJwtToken(newUser);
-
-                    return Ok(new RegistrationResponse()
+                    return Ok(new RegisterResultDto()
                     {
-                        Success = true,
-                        Token = jwtToken
+                        ErrorCode = ErrorCodes.Success
                     });
                 }
                 else
                 {
-                    return BadRequest(new RegistrationResponse()
+                    // ToDo: Remove application user
+                    // ToDo: Log errors.
+                    var errors = isCreated.Errors.Select(x => x.Description).ToList();
+                    return BadRequest(new RegisterResultDto()
                     {
-                        Errors = isCreated.Errors.Select(x => x.Description).ToList(),
-                        Success = false
+                        ErrorCode = ErrorCodes.UnknownError
                     });
                 }
             }
 
-            return BadRequest(new RegistrationResponse()
+            return BadRequest(new RegisterResultDto()
             {
-                Errors = new List<string>() {
-                        "Invalid payload"
-                    },
-                Success = false
+                ErrorCode = ErrorCodes.UnknownError
             });
         }
 
@@ -132,46 +123,42 @@ namespace UserService.Controllers
             if (ModelState.IsValid)
             {
                 var existingUser = await _userManager.FindByNameAsync(userLoginDto.Username);
-
                 if (existingUser == null)
                 {
-                    return BadRequest(new RegistrationResponse()
+                    return BadRequest(new LoginResultDto()
                     {
-                        Errors = new List<string>() {
-                                "Invalid login request."
-                            },
-                        Success = false
+                        Token = null,
+                        ErrorCode = ErrorCodes.UserNotFound,
+                        User = null
                     });
                 }
 
                 var isCorrect = await _userManager.CheckPasswordAsync(existingUser, userLoginDto.Password);
-
                 if (!isCorrect)
                 {
-                    return BadRequest(new RegistrationResponse()
+                    return BadRequest(new LoginResultDto()
                     {
-                        Errors = new List<string>() {
-                                "Invalid login request."
-                            },
-                        Success = false
+                        Token = null,
+                        ErrorCode = ErrorCodes.WrongPassword,
+                        User = null
                     });
                 }
 
                 var jwtToken = GenerateJwtToken(existingUser);
-
-                return Ok(new RegistrationResponse()
+                ApplicationUserReadDto applicationUserReadDto = (ApplicationUserReadDto)((OkObjectResult)GetUser(existingUser.Id).Result).Value;
+                return Ok(new LoginResultDto()
                 {
-                    Success = true,
-                    Token = jwtToken
+                    Token = jwtToken,
+                    ErrorCode = ErrorCodes.Success,
+                    User = applicationUserReadDto
                 });
             }
 
-            return BadRequest(new RegistrationResponse()
+            return BadRequest(new LoginResultDto()
             {
-                Errors = new List<string>() {
-                        "Invalid payload."
-                    },
-                Success = false
+                Token = null,
+                ErrorCode = ErrorCodes.WrongPassword,
+                User = null
             });
         }
 

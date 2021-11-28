@@ -194,6 +194,10 @@
       "ApplicationUserReadDto": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
           "email": {
             "type": "string",
             "nullable": true
