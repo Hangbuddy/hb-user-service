@@ -1,5 +1,9 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using UserService.Dtos.Enums;
 using UserService.Models;
 
 namespace UserService.Data
@@ -8,9 +12,13 @@ namespace UserService.Data
     {
         private readonly AppDbContext _context;
 
-        public UserRepo(AppDbContext context)
+        private readonly UserManager<IdentityUser> _userManager;
+
+        public UserRepo(AppDbContext context,
+                        UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public bool SaveChanges()
@@ -34,18 +42,56 @@ namespace UserService.Data
             };
         }
 
-        public void UpdateUser(ApplicationUser user)
+        public async Task<bool> UpdateUser(ApplicationUser user, string password)
         {
-            if (user == null)
+            var transaction = _context.Database.BeginTransaction();
+            try
             {
-                throw new ArgumentNullException(nameof(user));
+                if (user == null)
+                {
+                    throw new ArgumentNullException(nameof(user));
+                }
+                _context.ApplicationUsers.Update(user);
+                IdentityUser cUser = await _userManager.FindByIdAsync(user.Id);
+                var token = await _userManager.GeneratePasswordResetTokenAsync(cUser);
+                IdentityResult result = await _userManager.ResetPasswordAsync(cUser, token, password);
+                return result.Succeeded;
             }
-            _context.ApplicationUsers.Update(user);
+            catch (Exception)
+            {
+                transaction.Rollback();
+                return false;
+            }
         }
 
-        public void CreateUser(ApplicationUser user)
+        public async Task<ErrorCodes> CreateUser(ApplicationUser applicationUser, IdentityUser identityUser, string password)
         {
-            _context.ApplicationUsers.Add(user);
+            var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                if (await _userManager.FindByNameAsync(identityUser.UserName) != null)
+                    return ErrorCodes.UsernameAlreadyInUse;
+                if (await _userManager.FindByEmailAsync(identityUser.Email) != null)
+                    return ErrorCodes.EmailAlreadyInUse;
+
+                _context.ApplicationUsers.Add(applicationUser);
+
+                var isCreated = await _userManager.CreateAsync(identityUser, password);
+                if (isCreated.Succeeded)
+                    return ErrorCodes.Success;
+                else
+                {
+                    // ToDo: Remove application user
+                    // ToDo: Log errors.
+                    var errors = isCreated.Errors.Select(x => x.Description).ToList();
+                    return ErrorCodes.UnknownError;
+                }
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                return ErrorCodes.UnknownError;
+            }
         }
     }
 }

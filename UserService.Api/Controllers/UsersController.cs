@@ -55,66 +55,57 @@ namespace UserService.Controllers
             return NotFound();
         }
 
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet]
+        public ActionResult<ApplicationUserReadDto> GetUser()
+        {
+            var userItem = _repository.GetUser(User.FindFirst("Id")?.Value);
+            if (userItem != null)
+            {
+                return Ok(_mapper.Map<ApplicationUserReadDto>(userItem));
+            }
+
+            return NotFound();
+        }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut]
-        public ActionResult<ApplicationUserReadDto> UpdateUser(ApplicationUserUpdateDto userUpdateDto)
+        public async Task<ActionResult<ApplicationUserReadDto>> UpdateUser(ApplicationUserUpdateDto userUpdateDto)
         {
             var userId = User.FindFirst("Id")?.Value;
-            if (userId != userUpdateDto.UserId)
-                return Unauthorized();
             var applicationUser = _mapper.Map<ApplicationUser>(userUpdateDto);
-            _repository.UpdateUser(applicationUser);
-            _repository.SaveChanges();
-            return CreatedAtRoute(nameof(GetUser), new { userId = userUpdateDto.UserId }, userUpdateDto);
+            applicationUser.Id = userId;
+            var result = await _repository.UpdateUser(applicationUser, userUpdateDto.Password);
+            if (result)
+            {
+                _repository.SaveChanges();
+                return CreatedAtRoute(nameof(GetUser), new { userId }, userUpdateDto);
+            }
+            else
+                return BadRequest();
         }
 
         [HttpPost]
         public async Task<ActionResult<ApplicationUserReadDto>> CreateUser(ApplicationUserCreateDto userCreateDto)
         {
-            if (ModelState.IsValid)
-            {
-                if (await _userManager.FindByNameAsync(userCreateDto.Username) != null)
-                {
-                    return BadRequest(new RegisterResultDto()
-                    {
-                        ErrorCode = ErrorCodes.UsernameAlreadyInUse
-                    });
-                }
-                if (await _userManager.FindByEmailAsync(userCreateDto.Email) != null)
-                {
-                    return BadRequest(new RegisterResultDto()
-                    {
-                        ErrorCode = ErrorCodes.EmailAlreadyInUse
-                    });
-                }
+            IdentityUser identityUser = new() { Email = userCreateDto.Email, UserName = userCreateDto.Username };
+            var applicationUser = _mapper.Map<ApplicationUser>(identityUser);
+            ErrorCodes result = await _repository.CreateUser(applicationUser, identityUser, userCreateDto.Password);
 
-                var newUser = new IdentityUser() { Email = userCreateDto.Email, UserName = userCreateDto.Username };
-                var applicationUser = _mapper.Map<ApplicationUser>(newUser);
-                _repository.CreateUser(applicationUser);
-                var isCreated = await _userManager.CreateAsync(newUser, userCreateDto.Password);
-                if (isCreated.Succeeded)
+            if (result.Equals(ErrorCodes.Success))
+            {
+                _repository.SaveChanges();
+                return Ok(new RegisterResultDto()
                 {
-                    return Ok(new RegisterResultDto()
-                    {
-                        ErrorCode = ErrorCodes.Success
-                    });
-                }
-                else
-                {
-                    // ToDo: Remove application user
-                    // ToDo: Log errors.
-                    var errors = isCreated.Errors.Select(x => x.Description).ToList();
-                    return BadRequest(new RegisterResultDto()
-                    {
-                        ErrorCode = ErrorCodes.UnknownError
-                    });
-                }
+                    ErrorCode = ErrorCodes.Success
+                });
             }
-
-            return BadRequest(new RegisterResultDto()
-            {
-                ErrorCode = ErrorCodes.UnknownError
-            });
+            else
+                return BadRequest(new RegisterResultDto()
+                {
+                    ErrorCode = result
+                });
         }
 
         [HttpPost("login")]

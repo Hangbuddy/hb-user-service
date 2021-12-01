@@ -1,3 +1,6 @@
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using UserService.Dtos.Enums;
 using UserService.Models;
 
 namespace UserService.Data
@@ -8,8 +11,8 @@ namespace UserService.Data
 
         ApplicationUserRead GetUser(string userId);
 
-        void UpdateUser(ApplicationUser user);
+        Task<bool> UpdateUser(ApplicationUser user, string password);
 
-        void CreateUser(ApplicationUser user);
+        Task<ErrorCodes> CreateUser(ApplicationUser applicationUser, IdentityUser identityUser, string password);
     }
 }
