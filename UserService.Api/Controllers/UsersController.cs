@@ -55,7 +55,6 @@ namespace UserService.Controllers
             return NotFound();
         }
 
-
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         public ActionResult<ApplicationUserReadDto> GetUser()
@@ -69,8 +68,16 @@ namespace UserService.Controllers
             return NotFound();
         }
 
+        [HttpPost("get-users-bulk", Name = "GetUserBulk")]
+        public ActionResult<ApplicationUserReadDto> GetUsersBulk(List<string> userIdList)
+        {
+            var userItemList = _repository.GetUsersBulk(userIdList);
+            return Ok(_mapper.Map<List<ApplicationUserReadDto>>(userItemList));
+        }
+
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPut]
+        [HttpPut(Name = "UpdateUser")]
         public async Task<ActionResult<ApplicationUserReadDto>> UpdateUser(ApplicationUserUpdateDto userUpdateDto)
         {
             var userId = User.FindFirst("Id")?.Value;
@@ -86,7 +93,7 @@ namespace UserService.Controllers
                 return BadRequest();
         }
 
-        [HttpPost]
+        [HttpPost(Name = "CreateUser")]
         public async Task<ActionResult<ApplicationUserReadDto>> CreateUser(ApplicationUserCreateDto userCreateDto)
         {
             IdentityUser identityUser = new() { Email = userCreateDto.Email, UserName = userCreateDto.Username };
@@ -108,48 +115,38 @@ namespace UserService.Controllers
                 });
         }
 
-        [HttpPost("login")]
+        [HttpPost("login", Name = "login")]
         public async Task<ActionResult<ApplicationUserReadDto>> Login(ApplicationUserLoginDto userLoginDto)
         {
-            if (ModelState.IsValid)
+            var existingUser = await _userManager.FindByNameAsync(userLoginDto.Username);
+            if (existingUser == null)
             {
-                var existingUser = await _userManager.FindByNameAsync(userLoginDto.Username);
-                if (existingUser == null)
+                return BadRequest(new LoginResultDto()
                 {
-                    return BadRequest(new LoginResultDto()
-                    {
-                        Token = null,
-                        ErrorCode = ErrorCodes.UserNotFound,
-                        User = null
-                    });
-                }
-
-                var isCorrect = await _userManager.CheckPasswordAsync(existingUser, userLoginDto.Password);
-                if (!isCorrect)
-                {
-                    return BadRequest(new LoginResultDto()
-                    {
-                        Token = null,
-                        ErrorCode = ErrorCodes.WrongPassword,
-                        User = null
-                    });
-                }
-
-                var jwtToken = GenerateJwtToken(existingUser);
-                ApplicationUserReadDto applicationUserReadDto = (ApplicationUserReadDto)((OkObjectResult)GetUser(existingUser.Id).Result).Value;
-                return Ok(new LoginResultDto()
-                {
-                    Token = jwtToken,
-                    ErrorCode = ErrorCodes.Success,
-                    User = applicationUserReadDto
+                    Token = null,
+                    ErrorCode = ErrorCodes.UserNotFound,
+                    User = null
                 });
             }
 
-            return BadRequest(new LoginResultDto()
+            var isCorrect = await _userManager.CheckPasswordAsync(existingUser, userLoginDto.Password);
+            if (!isCorrect)
             {
-                Token = null,
-                ErrorCode = ErrorCodes.WrongPassword,
-                User = null
+                return BadRequest(new LoginResultDto()
+                {
+                    Token = null,
+                    ErrorCode = ErrorCodes.WrongPassword,
+                    User = null
+                });
+            }
+
+            var jwtToken = GenerateJwtToken(existingUser);
+            ApplicationUserReadDto applicationUserReadDto = (ApplicationUserReadDto)((OkObjectResult)GetUser(existingUser.Id).Result).Value;
+            return Ok(new LoginResultDto()
+            {
+                Token = jwtToken,
+                ErrorCode = ErrorCodes.Success,
+                User = applicationUserReadDto
             });
         }
 

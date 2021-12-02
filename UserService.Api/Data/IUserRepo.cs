@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using UserService.Dtos.Enums;
@@ -8,11 +9,9 @@ namespace UserService.Data
     public interface IUserRepo
     {
         bool SaveChanges();
-
         ApplicationUserRead GetUser(string userId);
-
+        List<ApplicationUserRead> GetUsersBulk(List<string> userIdList);
         Task<bool> UpdateUser(ApplicationUser user, string password);
-
         Task<ErrorCodes> CreateUser(ApplicationUser applicationUser, IdentityUser identityUser, string password);
     }
 }

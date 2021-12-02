@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -40,6 +41,11 @@ namespace UserService.Data
                 Bio = applicationUser.Bio,
                 IsActive = applicationUser.IsActive
             };
+        }
+
+        public List<ApplicationUserRead> GetUsersBulk(List<string> userIdList)
+        {
+            return userIdList.Select(userId => GetUser(userId)).ToList();
         }
 
         public async Task<bool> UpdateUser(ApplicationUser user, string password)

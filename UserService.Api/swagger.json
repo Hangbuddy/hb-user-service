@@ -47,10 +47,38 @@
       }
     },
     "/api/Users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "Users"
         ],
+        "operationId": "UpdateUser",
         "requestBody": {
           "content": {
             "application/json": {
@@ -97,6 +125,7 @@
         "tags": [
           "Users"
         ],
+        "operationId": "CreateUser",
         "requestBody": {
           "content": {
             "application/json": {
@@ -140,11 +169,73 @@
         }
       }
     },
+    "/api/Users/get-users-bulk": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetUserBulk",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Users/login": {
       "post": {
         "tags": [
           "Users"
         ],
+        "operationId": "login",
         "requestBody": {
           "content": {
             "application/json": {
@@ -221,14 +312,8 @@
         "additionalProperties": false
       },
       "ApplicationUserUpdateDto": {
-        "required": [
-          "userId"
-        ],
         "type": "object",
         "properties": {
-          "userId": {
-            "type": "string"
-          },
           "password": {
             "type": "string",
             "nullable": true
