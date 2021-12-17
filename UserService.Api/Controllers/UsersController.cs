@@ -42,6 +42,13 @@ namespace UserService.Controllers
             _jwtConfig = optionsMonitor.CurrentValue;
         }
 
+        [HttpGet("health-check", Name = "HealthCheck")]
+        public ActionResult<string> HealthCheck()
+        {
+            return Ok("Service is up and running.");
+        }
+
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{userId}", Name = "GetUser")]
         public ActionResult<ApplicationUserReadDto> GetUser(string userId)
@@ -68,13 +75,13 @@ namespace UserService.Controllers
             return NotFound();
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("get-users-bulk", Name = "GetUserBulk")]
-        public ActionResult<ApplicationUserReadDto> GetUsersBulk(List<string> userIdList)
+        public ActionResult<List<ApplicationUserReadDto>> GetUsersBulk(List<string> userIdList)
         {
             var userItemList = _repository.GetUsersBulk(userIdList);
             return Ok(_mapper.Map<List<ApplicationUserReadDto>>(userItemList));
         }
-
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut(Name = "UpdateUser")]
@@ -92,6 +99,7 @@ namespace UserService.Controllers
             else
                 return BadRequest();
         }
+
 
         [HttpPost(Name = "CreateUser")]
         public async Task<ActionResult<ApplicationUserReadDto>> CreateUser(ApplicationUserCreateDto userCreateDto)
@@ -115,8 +123,8 @@ namespace UserService.Controllers
                 });
         }
 
-        [HttpPost("login", Name = "login")]
-        public async Task<ActionResult<ApplicationUserReadDto>> Login(ApplicationUserLoginDto userLoginDto)
+        [HttpPost("login", Name = "Login")]
+        public async Task<ActionResult<LoginResultDto>> Login(ApplicationUserLoginDto userLoginDto)
         {
             var existingUser = await _userManager.FindByNameAsync(userLoginDto.Username);
             if (existingUser == null)

@@ -27,7 +27,6 @@ namespace UserService
 
         public void ConfigureServices(IServiceCollection services)
         {
-            Console.WriteLine("--> Using SqlServer Db");
             services.AddDbContext<AppDbContext>(opt =>
                 opt.UseSqlServer(Configuration.GetConnectionString("UsersConn")));
 
