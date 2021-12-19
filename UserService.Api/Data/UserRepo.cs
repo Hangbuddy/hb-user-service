@@ -36,10 +36,9 @@ namespace UserService.Data
             {
                 Id = user.Id,
                 Email = user.Email,
-                Username = user.UserName,
                 DisplayName = applicationUser.DisplayName,
                 Bio = applicationUser.Bio,
-                IsActive = applicationUser.IsActive
+                BirthDate = applicationUser.BirthDate
             };
         }
 

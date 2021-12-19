@@ -16,7 +16,6 @@ namespace UserService.Profiles
             CreateMap<ApplicationUserUpdateDto, ApplicationUser>()
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.Now));
             CreateMap<IdentityUser, ApplicationUser>()
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now));
             CreateMap<ApplicationUser, ApplicationUserReadDto>();
         }

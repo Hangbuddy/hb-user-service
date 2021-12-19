@@ -5,6 +5,36 @@
     "version": "v1"
   },
   "paths": {
+    "/api/Users/health-check": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "HealthCheck",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Users/{userId}": {
       "get": {
         "tags": [
@@ -212,17 +242,26 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationUserReadDto"
+                  }
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationUserReadDto"
+                  }
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationUserReadDto"
+                  }
                 }
               }
             }
@@ -235,7 +274,7 @@
         "tags": [
           "Users"
         ],
-        "operationId": "login",
+        "operationId": "Login",
         "requestBody": {
           "content": {
             "application/json": {
@@ -261,17 +300,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                  "$ref": "#/components/schemas/LoginResultDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                  "$ref": "#/components/schemas/LoginResultDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                  "$ref": "#/components/schemas/LoginResultDto"
                 }
               }
             }
@@ -293,10 +332,6 @@
             "type": "string",
             "nullable": true
           },
-          "username": {
-            "type": "string",
-            "nullable": true
-          },
           "displayName": {
             "type": "string",
             "nullable": true
@@ -305,8 +340,9 @@
             "type": "string",
             "nullable": true
           },
-          "isActive": {
-            "type": "boolean"
+          "birthDate": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
@@ -326,22 +362,19 @@
             "type": "string",
             "nullable": true
           },
-          "isActive": {
-            "type": "boolean"
+          "birthDate": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
       },
       "ApplicationUserCreateDto": {
         "required": [
-          "password",
-          "username"
+          "password"
         ],
         "type": "object",
         "properties": {
-          "username": {
-            "type": "string"
-          },
           "password": {
             "type": "string"
           },
@@ -355,16 +388,44 @@
       },
       "ApplicationUserLoginDto": {
         "required": [
-          "password",
-          "username"
+          "email",
+          "password"
         ],
         "type": "object",
         "properties": {
-          "username": {
+          "email": {
             "type": "string"
           },
           "password": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ErrorCodes": {
+        "enum": [
+          10000,
+          10001,
+          10002,
+          10003,
+          10004,
+          10005
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "LoginResultDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "nullable": true
+          },
+          "errorCode": {
+            "$ref": "#/components/schemas/ErrorCodes"
+          },
+          "user": {
+            "$ref": "#/components/schemas/ApplicationUserReadDto"
           }
         },
         "additionalProperties": false

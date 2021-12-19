@@ -101,7 +101,7 @@ namespace UserService.Controllers
         [HttpPost(Name = "CreateUser")]
         public async Task<ActionResult<ApplicationUserReadDto>> CreateUser(ApplicationUserCreateDto userCreateDto)
         {
-            IdentityUser identityUser = new() { Email = userCreateDto.Email, UserName = userCreateDto.Username };
+            IdentityUser identityUser = new() { Email = userCreateDto.Email };
             var applicationUser = _mapper.Map<ApplicationUser>(identityUser);
             ErrorCodes result = await _repository.CreateUser(applicationUser, identityUser, userCreateDto.Password);
 
@@ -120,7 +120,7 @@ namespace UserService.Controllers
         [HttpPost("login", Name = "Login")]
         public async Task<ActionResult<LoginResultDto>> Login(ApplicationUserLoginDto userLoginDto)
         {
-            var existingUser = await _userManager.FindByNameAsync(userLoginDto.Username);
+            var existingUser = await _userManager.FindByEmailAsync(userLoginDto.Email);
             if (existingUser == null)
             {
                 return BadRequest(new LoginResultDto()
