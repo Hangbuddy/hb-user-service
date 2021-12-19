@@ -101,7 +101,7 @@ namespace UserService.Controllers
         [HttpPost(Name = "CreateUser")]
         public async Task<ActionResult<ApplicationUserReadDto>> CreateUser(ApplicationUserCreateDto userCreateDto)
         {
-            IdentityUser identityUser = new() { Email = userCreateDto.Email };
+            IdentityUser identityUser = new() { Email = userCreateDto.Email, UserName = userCreateDto.Email };
             var applicationUser = _mapper.Map<ApplicationUser>(identityUser);
             ErrorCodes result = await _repository.CreateUser(applicationUser, identityUser, userCreateDto.Password);
 
@@ -164,10 +164,9 @@ namespace UserService.Controllers
                 {
                     new Claim("Id", user.Id),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 }),
-                Expires = DateTime.UtcNow.AddHours(6),
+                Expires = DateTime.UtcNow.AddHours(24),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
