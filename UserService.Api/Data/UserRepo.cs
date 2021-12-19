@@ -22,7 +22,7 @@ namespace UserService.Data
             _userManager = userManager;
         }
 
-        public bool SaveChanges()
+        private bool SaveChanges()
         {
             return _context.SaveChanges() >= 0;
         }
@@ -58,10 +58,18 @@ namespace UserService.Data
                     throw new ArgumentNullException(nameof(user));
                 }
                 _context.ApplicationUsers.Update(user);
-                IdentityUser cUser = await _userManager.FindByIdAsync(user.Id);
-                var token = await _userManager.GeneratePasswordResetTokenAsync(cUser);
-                IdentityResult result = await _userManager.ResetPasswordAsync(cUser, token, password);
-                return result.Succeeded;
+                if (!string.IsNullOrEmpty(password))
+                {
+                    IdentityUser cUser = await _userManager.FindByIdAsync(user.Id);
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(cUser);
+                    IdentityResult result = await _userManager.ResetPasswordAsync(cUser, token, password);
+                    if (result.Succeeded)
+                    {
+                        transaction.Rollback();
+                        return false;
+                    }
+                }
+                return SaveChanges();
             }
             catch (Exception)
             {
@@ -76,20 +84,36 @@ namespace UserService.Data
             try
             {
                 if (await _userManager.FindByNameAsync(identityUser.UserName) != null)
+                {
+                    transaction.Rollback();
                     return ErrorCodes.UsernameAlreadyInUse;
+                }
                 if (await _userManager.FindByEmailAsync(identityUser.Email) != null)
+                {
+                    transaction.Rollback();
                     return ErrorCodes.EmailAlreadyInUse;
-
+                }
                 _context.ApplicationUsers.Add(applicationUser);
 
                 var isCreated = await _userManager.CreateAsync(identityUser, password);
                 if (isCreated.Succeeded)
-                    return ErrorCodes.Success;
+                {
+                    if (SaveChanges())
+                    {
+                        transaction.Commit();
+                        return ErrorCodes.Success;
+                    }
+                    else
+                    {
+                        transaction.Rollback();
+                        return ErrorCodes.UnknownError;
+                    }
+                }
                 else
                 {
-                    // ToDo: Remove application user
                     // ToDo: Log errors.
-                    var errors = isCreated.Errors.Select(x => x.Description).ToList();
+                    // var errors = isCreated.Errors.Select(x => x.Description).ToList();
+                    transaction.Rollback();
                     return ErrorCodes.UnknownError;
                 }
             }

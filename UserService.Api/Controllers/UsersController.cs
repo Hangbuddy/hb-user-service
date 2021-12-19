@@ -92,10 +92,7 @@ namespace UserService.Controllers
             applicationUser.Id = userId;
             var result = await _repository.UpdateUser(applicationUser, userUpdateDto.Password);
             if (result)
-            {
-                _repository.SaveChanges();
                 return CreatedAtRoute(nameof(GetUser), new { userId }, userUpdateDto);
-            }
             else
                 return BadRequest();
         }
@@ -109,13 +106,10 @@ namespace UserService.Controllers
             ErrorCodes result = await _repository.CreateUser(applicationUser, identityUser, userCreateDto.Password);
 
             if (result.Equals(ErrorCodes.Success))
-            {
-                _repository.SaveChanges();
                 return Ok(new RegisterResultDto()
                 {
                     ErrorCode = ErrorCodes.Success
                 });
-            }
             else
                 return BadRequest(new RegisterResultDto()
                 {
