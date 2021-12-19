@@ -171,7 +171,7 @@ namespace UserService.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<string>("ProviderDisplayName")
+                    b.Property<string>("ProviderName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -235,7 +235,7 @@ namespace UserService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DisplayName")
+                    b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")

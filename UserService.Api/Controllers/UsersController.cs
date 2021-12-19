@@ -99,7 +99,7 @@ namespace UserService.Controllers
 
 
         [HttpPost(Name = "CreateUser")]
-        public async Task<ActionResult<ApplicationUserReadDto>> CreateUser(ApplicationUserCreateDto userCreateDto)
+        public async Task<ActionResult<RegisterResultDto>> CreateUser(ApplicationUserCreateDto userCreateDto)
         {
             IdentityUser identityUser = new() { Email = userCreateDto.Email, UserName = userCreateDto.Email };
             var applicationUser = _mapper.Map<ApplicationUser>(identityUser);
