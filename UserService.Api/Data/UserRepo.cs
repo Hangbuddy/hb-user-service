@@ -63,13 +63,22 @@ namespace UserService.Data
                     IdentityUser cUser = await _userManager.FindByIdAsync(user.Id);
                     var token = await _userManager.GeneratePasswordResetTokenAsync(cUser);
                     IdentityResult result = await _userManager.ResetPasswordAsync(cUser, token, password);
-                    if (result.Succeeded)
+                    if (!result.Succeeded)
                     {
                         transaction.Rollback();
                         return false;
                     }
                 }
-                return SaveChanges();
+                if (SaveChanges())
+                {
+                    transaction.Commit();
+                    return true;
+                }
+                else
+                {
+                    transaction.Rollback();
+                    return false;
+                }
             }
             catch (Exception)
             {
