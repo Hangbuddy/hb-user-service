@@ -4,7 +4,6 @@ namespace UserService.Dtos.Enums
     {
         Success = 10000,
         UnknownError = 10001,
-        UsernameAlreadyInUse = 10002,
         EmailAlreadyInUse = 10003,
         UserNotFound = 10004,
         WrongPassword = 10005

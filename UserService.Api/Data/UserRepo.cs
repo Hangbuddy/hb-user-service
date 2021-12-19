@@ -91,11 +91,6 @@ namespace UserService.Data
             var transaction = _context.Database.BeginTransaction();
             try
             {
-                if (await _userManager.FindByNameAsync(identityUser.UserName) != null)
-                {
-                    transaction.Rollback();
-                    return ErrorCodes.UsernameAlreadyInUse;
-                }
                 if (await _userManager.FindByEmailAsync(identityUser.Email) != null)
                 {
                     transaction.Rollback();
