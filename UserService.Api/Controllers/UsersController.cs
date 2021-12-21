@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -102,7 +101,8 @@ namespace UserService.Controllers
         public async Task<ActionResult<RegisterResultDto>> CreateUser(ApplicationUserCreateDto userCreateDto)
         {
             IdentityUser identityUser = new() { Email = userCreateDto.Email, UserName = userCreateDto.Email };
-            var applicationUser = _mapper.Map<ApplicationUser>(identityUser);
+            var applicationUser = _mapper.Map<ApplicationUser>(userCreateDto);
+            applicationUser.Id = identityUser.Id;
             ErrorCodes result = await _repository.CreateUser(applicationUser, identityUser, userCreateDto.Password);
 
             if (result.Equals(ErrorCodes.Success))

@@ -181,17 +181,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                  "$ref": "#/components/schemas/RegisterResultDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                  "$ref": "#/components/schemas/RegisterResultDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApplicationUserReadDto"
+                  "$ref": "#/components/schemas/RegisterResultDto"
                 }
               }
             }
@@ -371,17 +371,41 @@
       },
       "ApplicationUserCreateDto": {
         "required": [
+          "displayName",
           "password"
         ],
         "type": "object",
         "properties": {
-          "password": {
-            "type": "string"
-          },
           "email": {
             "type": "string",
             "format": "email",
             "nullable": true
+          },
+          "password": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ErrorCodes": {
+        "enum": [
+          10000,
+          10001,
+          10003,
+          10004,
+          10005
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "RegisterResultDto": {
+        "type": "object",
+        "properties": {
+          "errorCode": {
+            "$ref": "#/components/schemas/ErrorCodes"
           }
         },
         "additionalProperties": false
@@ -401,18 +425,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "ErrorCodes": {
-        "enum": [
-          10000,
-          10001,
-          10002,
-          10003,
-          10004,
-          10005
-        ],
-        "type": "integer",
-        "format": "int32"
       },
       "LoginResultDto": {
         "type": "object",
