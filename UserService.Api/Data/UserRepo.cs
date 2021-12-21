@@ -36,7 +36,7 @@ namespace UserService.Data
             {
                 Id = user.Id,
                 Email = user.Email,
-                Name = applicationUser.Name,
+                DisplayName = applicationUser.DisplayName,
                 Bio = applicationUser.Bio,
                 BirthDate = applicationUser.BirthDate
             };

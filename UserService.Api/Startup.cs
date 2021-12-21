@@ -82,7 +82,8 @@ namespace UserService
                 endpoints.MapControllers();
             });
 
-            PrepDb.PrepPopulation(app);
+            if (!PrepDb.PrepPopulation(app))
+                throw new Exception("Migrations failed to run.");
 
         }
     }

@@ -9,7 +9,7 @@ namespace UserService.Dtos.Requests
         [Required]
         public string Password { get; set; }
         [Required]
-        public string Name { get; set; }
+        public string DisplayName { get; set; }
 
     }
 }
